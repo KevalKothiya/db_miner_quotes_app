@@ -38,6 +38,17 @@ dependencies:
   get: ^4.6.5
   shared_preferences: ^2.1.2
   sizer: ^2.0.15
+  get_storage: ^2.1.1
+  carousel_slider: ^4.2.1
+  page_transition: ^2.0.9
+  async_wallpaper: ^2.0.3
+  screenshot: ^2.1.0
+  crop: ^0.5.5
+  intl:
+  http:
+  path_provider:
+  provider:
+  animated_text_kit:
   path:
   sqflite:
 
@@ -75,6 +86,7 @@ flutter:
     - assets/images/self/
     - assets/images/success/
     - assets/images/motivational/
+    - assets/images/set_image/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
