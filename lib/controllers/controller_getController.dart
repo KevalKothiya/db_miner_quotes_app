@@ -1,8 +1,8 @@
 import 'package:db_miner/models/globals.dart';
 import 'package:db_miner/models/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingController_Getx extends GetxController {
   SettingController_Model settingController =
@@ -44,17 +44,8 @@ class Image_GetController extends GetxController {
   ];
 }
 
-class OneTime_GetxController extends GetxController {
-  int count = 0;
-
-  increment() {
-    count = 1;
-    update();
-  }
-}
-
 class Storage extends GetxController {
-  StorageData storageData = StorageData(storageData: false, storage: false, storageFavourite: false,loaclStorage: false);
+  StorageData storageData = StorageData(storageData: false, storage: false,storageFavourite: false);
 
   trueMethodData() async {
     storageData.storageData = true;
@@ -68,111 +59,98 @@ class Storage extends GetxController {
     update();
   }
 
-  trueMethodOfFavourite() async {
+  trueMethodFavourite() async {
     storageData.storageFavourite = true;
-    box.write('storageFavourite', storageData.storageFavourite);
+    box.write('favourite', storageData.storageFavourite);
     update();
   }
-  trueMethodOfLocal() async {
-    storageData.loaclStorage = true;
-    box.write('loaclStorage', storageData.loaclStorage);
+
+  falseMethodFavourite() async {
+    storageData.storageFavourite = false;
+    box.write('favourite', storageData.storageFavourite);
     update();
   }
 }
 
 class FetchId extends GetxController {
-  RxInt? i;
+  int? i;
 
   fetchId({required int id}) {
-    i = id.obs;
+    i = id;
   }
 }
 
 class CarouselSliderImage_Getx extends GetxController {
   CarouselSliderImage_Model carousel_Model = CarouselSliderImage_Model(
       carouselimage:
-          "https://pixabay.com/get/g9ac2e2bbdc81843e86e9ef7ddbfaa67d69b2f32807adeb4e69e4b79832a0dfcbc389493071262e7bcc357b5fb1fb8531b489a2fa46683129d621432926d2b53e_1280.jpg");
+          "https://pixabay.com/get/ged0c5f73d0e5e5101718876808bc5b9fa0f65092efbb866380310e8bfd3b9418287c940bf9db02fec8a7a4d3ecb8dd487a14d9ef19b67d08b6f0dfd0f5059644_1280.jpg");
 
   getter({required String selectedImage}) async {
     carousel_Model.carouselimage = selectedImage;
   }
 }
 
-class NewFolderList_Getx extends ChangeNotifier {
+class NewFolderList_Getx extends GetxController {
   NewFolderList_Model newFolder =
-      NewFolderList_Model(box.read('newFolderList') ?? []);
+      NewFolderList_Model(newFolderList: box.read('newFolder') ?? []);
 
   init({required String tableName}) async {
     newFolder.newFolderList.add(tableName);
 
-    box.write('newFolderList', newFolder.newFolderList);
+    box.write('newFolder', newFolder.newFolderList);
 
-    notifyListeners();
+    update();
   }
 }
 
 class TextEditMenu_Getx extends GetxController {
   TextEditMenu_Model textEditMenu_Model = TextEditMenu_Model(
-    color: box.read('color') ?? Colors.black,
-    backgroundColor: box.read('backgroundColor') ?? Colors.transparent,
+    color: box.read('color') ?? CupertinoColors.black,
+    backGroundColor: box.read('backGroundColor') ?? CupertinoColors.black,
     fontWeight: box.read('fontWeight') ?? FontWeight.normal,
-    fontSize: box.read('fontSize') ?? 14,
     fontStyle: box.read('fontStyle') ?? FontStyle.normal,
+    fontSize: box.read('fontSize') ?? 16,
     letterSpacing: box.read('letterSpacing') ?? 0,
     wordSpacing: box.read('wordSpacing') ?? 0,
   );
 
-  initializationInColor({
-    required Color color,
-  }) {
+  initializationInColor({required Color color}) {
     textEditMenu_Model.color = color;
     box.write('color', textEditMenu_Model.color);
     update();
   }
 
-  initializationInBackgroundColor({
-    required Color backgroundColor,
-  }) {
-    textEditMenu_Model.backgroundColor = backgroundColor;
-    box.write('backgroundColor', textEditMenu_Model.backgroundColor);
+  initializationInBackGroundColor({required Color backGroundColor}) {
+    textEditMenu_Model.backGroundColor = backGroundColor;
+    box.write('backGroundColor', textEditMenu_Model.backGroundColor);
     update();
   }
 
-  initializationInFontWeight({
-    required FontWeight fontWeight,
-  }) {
+  initializationInFontWeight({required FontWeight fontWeight}) {
     textEditMenu_Model.fontWeight = fontWeight;
     box.write('fontWeight', textEditMenu_Model.fontWeight);
     update();
   }
 
-  initializationInFontSize({
-    required double fontSize,
-  }) {
-    textEditMenu_Model.fontSize = fontSize;
-    box.write('fontSize', textEditMenu_Model.fontSize);
-    update();
-  }
-
-  initializationInFontStyle({
-    required FontStyle fontStyle,
-  }) {
+  initializationInFontStyle({required FontStyle fontStyle}) {
     textEditMenu_Model.fontStyle = fontStyle;
     box.write('fontStyle', textEditMenu_Model.fontStyle);
     update();
   }
 
-  initializationInLetterSpacing({
-    required double letterSpacing,
-  }) {
+  initializationInFontSize({required double fontSize}) {
+    textEditMenu_Model.fontSize = fontSize;
+    box.write('fontSize', textEditMenu_Model.fontSize);
+    update();
+  }
+
+  initializationInLetterSpacing({required double letterSpacing}) {
     textEditMenu_Model.letterSpacing = letterSpacing;
     box.write('letterSpacing', textEditMenu_Model.letterSpacing);
     update();
   }
 
-  initializationInWordSpacing({
-    required double wordSpacing,
-  }) {
+  initializationInWordSpacing({required double wordSpacing}) {
     textEditMenu_Model.wordSpacing = wordSpacing;
     box.write('wordSpacing', textEditMenu_Model.wordSpacing);
     update();

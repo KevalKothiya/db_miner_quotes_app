@@ -66,7 +66,7 @@ class _ImagePageState extends State<ImagePage> {
                     style: TextStyle(
                       color: (settingController.settingController.isDarkMode)
                           ? CupertinoColors.systemPurple
-                          : CupertinoColors.white,
+                          : CupertinoColors.black,
                     ),
                     placeholder: "Saarch....",
                     decoration: BoxDecoration(

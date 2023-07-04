@@ -1,6 +1,10 @@
 import 'package:db_miner/controllers/controller_getController.dart';
+import 'package:db_miner/controllers/dp_helper.dart';
+import 'package:db_miner/models/globals.dart';
+import 'package:db_miner/screens/fontsize_page.dart';
 import 'package:db_miner/screens/set_image_page.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,10 +19,10 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-
   String? selectedValue;
 
   SettingController_Getx settingController = Get.put(SettingController_Getx());
+
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +33,14 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundColor: (settingController.settingController.isDarkMode)
                 ? CupertinoColors.black
                 : CupertinoColors.white,
-            leading: Icon(CupertinoIcons.person_2),
+            leading: GestureDetector(
+              onTap: () {
+                Navigator.pushNamedAndRemoveUntil(
+                        context, '/', (route) => false)
+                    .then((value) => setState(() {}));
+              },
+              child: Icon(CupertinoIcons.back),
+            ),
             largeTitle: Text(
               'Developer',
               style: TextStyle(
@@ -39,8 +50,20 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             trailing: CupertinoButton(
-              onPressed: () {
+              onPressed: () async {
                 Get.toNamed('/favourite_page');
+                // DBHelper.dbHelper.fetchAllDataFavourite();
+
+                // Navigator.pop(
+                //   context,
+                //   PageTransition(
+                //       type: PageTransitionType.leftToRight,
+                //       child: ProfilePage(),
+                //       inheritTheme: true,
+                //       curve: Curves.easeInOut,
+                //       duration: Duration(milliseconds: 10000),
+                //       ctx: context),
+                // );
               },
               child: Icon(
                 CupertinoIcons.heart_circle_fill,
@@ -220,66 +243,17 @@ class _ProfilePageState extends State<ProfilePage> {
                               color: CupertinoColors.systemGrey,
                             ),
                             onPressed: () {
-                              Get.toNamed("/font_size_page");
-                              // showCupertinoDialog(
-                              //   context: context,
-                              //   builder: (context) {
-                              //     return CupertinoAlertDialog(
-                              //       title: Text("Text Edit Menu"),
-                              //       content: Container(
-                              //         child: Column(
-                              //           mainAxisAlignment:
-                              //               MainAxisAlignment.start,
-                              //           children: [
-                              //             Row(
-                              //               children: [
-                              //                 Text("Font"),
-                              //                 CupertinoButton(
-                              //                     child: Icon(
-                              //                       CupertinoIcons.chevron_down,
-                              //                     ),
-                              //                     onPressed: () {
-                              //                       showCupertinoModalPopup(context: context,builder: (context){
-                              //                         return CupertinoPicker(
-                              //                           magnification: 1.22,
-                              //                           squeeze: 1.2,
-                              //                           useMagnifier: true,
-                              //                           itemExtent: 32,
-                              //                           // This sets the initial item.
-                              //                           scrollController: FixedExtentScrollController(
-                              //                             initialItem: 0,
-                              //                           ),
-                              //                           // This is called when selected item is changed.
-                              //                           onSelectedItemChanged:
-                              //                               (val) {},
-                              //                           children: [
-                              //                             Text("Italic"),
-                              //                             Text("Normal"),
-                              //                           ],
-                              //                         );
-                              //                       });
-                              //                     })
-                              //               ],
-                              //             ),
-                              //           ],
-                              //         ),
-                              //       ),
-                              //       actions: [
-                              //         cupertinoDialogAction(
-                              //           context: "Cansel",
-                              //           isDestructiveAction: true,
-                              //           onPressed: () {
-                              //             Get.back();
-                              //           },
-                              //         ),
-                              //         cupertinoDialogAction(
-                              //           context: "Save",
-                              //           onPressed: () {},
-                              //         ),
-                              //       ],
-                              //     );
-                              //   },
-                              // );
+                              Navigator.push(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.leftToRightPop,
+                                    child: FontSizePage(),
+                                    inheritTheme: true,
+                                    curve: Curves.easeInOut,
+                                    childCurrent: Container(),
+                                    duration: Duration(milliseconds: 2000),
+                                    ctx: context),
+                              );
                             },
                           ),
                         ),

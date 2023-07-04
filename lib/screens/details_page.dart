@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:async_wallpaper/async_wallpaper.dart';
@@ -14,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 
 class DetailsPage extends StatefulWidget {
@@ -24,18 +24,19 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-
   FetchId fetchId = Get.find<FetchId>();
 
   Future<List<DataBase>>? getQutoes;
+
+  TextEditMenu_Getx _editMenu_Getx = Get.put(TextEditMenu_Getx());
 
   Future<List<NewFolderList_DataBase>?>? getTableName;
 
   SettingController_Getx settingController = Get.put(SettingController_Getx());
 
-  CarouselSliderImage_Getx carouselImage = Get.put(CarouselSliderImage_Getx());
+  Storage storage = Get.put(Storage());
 
-  TextEditMenu_Getx _editMenu_Getx = Get.put(TextEditMenu_Getx());
+  CarouselSliderImage_Getx carouselImage = Get.put(CarouselSliderImage_Getx());
 
   ScreenshotController screenshotController = ScreenshotController();
 
@@ -43,21 +44,16 @@ class _DetailsPageState extends State<DetailsPage> {
   void initState() {
     super.initState();
 
-    getQutoes = DBHelper.dbHelper.fetchAllRecordsData(id: fetchId.i!.value);
-
+    getQutoes = DBHelper.dbHelper.fetchAllRecordsData(id: fetchId.i ?? 0);
 
     getTableName = DBHelper.dbHelper.fetchIntoNewFolderNameSave();
+
+    carouselImage.carousel_Model.carouselimage;
   }
 
   @override
   Widget build(BuildContext context) {
-    DataBase_Model data =
-        ModalRoute.of(context)!.settings.arguments as DataBase_Model;
-
     return CupertinoPageScaffold(
-        backgroundColor: (settingController.settingController.isDarkMode)
-            ? CupertinoColors.black
-            : CupertinoColors.white,
       child: CustomScrollView(
         slivers: [
           SliverFillRemaining(
@@ -103,26 +99,23 @@ class _DetailsPageState extends State<DetailsPage> {
                                       Wrap(
                                         children: [
                                           Text(
-                                            ss[i].quote,
+                                            ss[i].quote.toString(),
                                             style: TextStyle(
-                                              color:
-                                                  CupertinoColors.systemGrey5,
+                                              fontSize: _editMenu_Getx
+                                                  .textEditMenu_Model.fontSize,
                                               letterSpacing: _editMenu_Getx
                                                   .textEditMenu_Model
                                                   .letterSpacing,
                                               wordSpacing: _editMenu_Getx
                                                   .textEditMenu_Model
                                                   .wordSpacing,
-                                              fontStyle: _editMenu_Getx
-                                                  .textEditMenu_Model.fontStyle,
-                                              fontSize: _editMenu_Getx
-                                                  .textEditMenu_Model.fontSize,
                                               fontWeight: _editMenu_Getx
                                                   .textEditMenu_Model
                                                   .fontWeight,
-                                              backgroundColor: _editMenu_Getx
-                                                  .textEditMenu_Model
-                                                  .backgroundColor,
+                                              fontStyle: _editMenu_Getx
+                                                  .textEditMenu_Model.fontStyle,
+                                              color:
+                                                  CupertinoColors.systemGrey5,
                                             ),
                                           ),
                                         ],
@@ -139,24 +132,23 @@ class _DetailsPageState extends State<DetailsPage> {
                                               TypewriterAnimatedText(
                                                 ss[i].author,
                                                 textStyle: TextStyle(
-                                                  color:
-                                                  CupertinoColors.systemGrey5,
+                                                  fontSize: _editMenu_Getx
+                                                      .textEditMenu_Model
+                                                      .fontSize,
                                                   letterSpacing: _editMenu_Getx
                                                       .textEditMenu_Model
                                                       .letterSpacing,
                                                   wordSpacing: _editMenu_Getx
                                                       .textEditMenu_Model
                                                       .wordSpacing,
-                                                  fontStyle: _editMenu_Getx
-                                                      .textEditMenu_Model.fontStyle,
-                                                  fontSize: _editMenu_Getx
-                                                      .textEditMenu_Model.fontSize,
                                                   fontWeight: _editMenu_Getx
                                                       .textEditMenu_Model
                                                       .fontWeight,
-                                                  backgroundColor: _editMenu_Getx
+                                                  fontStyle: _editMenu_Getx
                                                       .textEditMenu_Model
-                                                      .backgroundColor,
+                                                      .fontStyle,
+                                                  color: CupertinoColors
+                                                      .systemGrey,
                                                 ),
                                                 speed: Duration(
                                                   milliseconds: 100,
@@ -173,207 +165,255 @@ class _DetailsPageState extends State<DetailsPage> {
                                         ],
                                       ),
                                       Spacer(),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          cupertinoButton(
-                                            icon: CupertinoIcons.heart_fill,
-                                            color:
-                                                CupertinoColors.white.withOpacity(0.5),
-                                            onPressed: (){
-
-                                              print(ss[i].idd);
-                                              DBHelper.dbHelper.updateData(val: "true",id: ss[i].id, idd: ss[i].idd);
-                                              print(ss[i].id);
-                                              print(ss[i].fav);
-                                            },
-                                          ),
-                                          cupertinoButton(
-                                            icon: CupertinoIcons.share_up,
-                                            color: CupertinoColors.white.withOpacity(0.5),
-                                            onPressed: null,
-                                          ),
-                                          FutureBuilder(
-                                              future: getTableName,
-                                              builder: (context, snapshot) {
-                                                if (snapshot.hasError) {
-                                                  return Center(
-                                                    child: Text(
-                                                        "Error :${snapshot.error}"),
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            cupertinoButton(
+                                              icon: CupertinoIcons.heart_fill,
+                                              color: (ss[i].favourite == "true")
+                                                  ? CupertinoColors.systemRed
+                                                  : CupertinoColors.systemGrey,
+                                              onPressed: () async {
+                                                if (ss[i].favourite == "true") {
+                                                  DBHelper.dbHelper
+                                                      .UpDateIntoQuotesForFalse(
+                                                    val: "false",
+                                                    fetchId: ss[i].id,
+                                                    fetchIdd: ss[i].idd,
                                                   );
-                                                } else if (snapshot.hasData) {
-                                                  List<NewFolderList_DataBase>?
-                                                      sss = snapshot.data;
-                                                  return (sss!.isEmpty)
-                                                      ? Center(
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () {
-                                                              Get.toNamed('/');
-                                                            },
-                                                            child: Text(
-                                                              "Create Folder",
-                                                              style: TextStyle(
-                                                                  color: CupertinoColors
-                                                                      .systemGrey),
-                                                            ),
-                                                          ),
-                                                        )
-                                                      : Container(
-                                                          height: 25,
-                                                          width: 25,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        5),
-                                                            color:
-                                                                CupertinoColors
-                                                                    .white,
-                                                          ),
-                                                          // color: CupertinoColors.black,
-                                                          child:
-                                                              CupertinoContextMenu(
-                                                            actions: sss.map(
-                                                              (e) {
-                                                                int i = sss
-                                                                    .indexOf(e);
-                                                                return CupertinoContextMenuAction(
-                                                                  child: Text(
-                                                                      "${e.tableName}"),
-                                                                  onPressed:
-                                                                      () async {
-                                                                    print(e
-                                                                        .tableName);
-                                                                    await DBHelper
-                                                                        .dbHelper
-                                                                        .addNewFolder(
-                                                                            name:
-                                                                                e.tableName);
-                                                                    // print("1");
-                                                                    await DBHelper
-                                                                        .dbHelper
-                                                                        .insertIntoNewFolder(
-                                                                      tableName:
-                                                                          e.tableName,
-                                                                      id: ss[i]
-                                                                          .id,
-                                                                      name: data
-                                                                          .name,
-                                                                      author: ss[
-                                                                              i]
-                                                                          .author,
-                                                                      quote: ss[
-                                                                              i]
-                                                                          .quote,
-                                                                    );
-                                                                    // print("2");
-                                                                    Get.snackbar(
-                                                                        "SUSSESS",
-                                                                        "Successfully Insert Into ${e.tableName}");
-                                                                    // print("3");
-                                                                  },
-                                                                );
-                                                              },
-                                                            ).toList(),
-                                                            child: Container(
-                                                              height: 25,
-                                                              width: 25,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            5),
-                                                                color:
-                                                                    CupertinoColors
-                                                                        .white,
-                                                              ),
-                                                              child: Icon(
-                                                                CupertinoIcons
-                                                                    .add,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        );
+                                                  print("DELETE SUCCESSFULL");
+                                                  getQutoes = DBHelper.dbHelper
+                                                      .fetchAllRecordsData(
+                                                          id: fetchId.i!);
+                                                  DBHelper.dbHelper
+                                                      .deleteFromFavourite(
+                                                          id: ss[i].id,
+                                                          idd: ss[i].idd);
+                                                } else {
+                                                  DBHelper.dbHelper
+                                                      .UpDateIntoQuotes(
+                                                    val: "true",
+                                                    fetchId: ss[i].id,
+                                                    fetchIdd: ss[i].idd,
+                                                  );
+                                                  getQutoes = DBHelper.dbHelper
+                                                      .fetchAllRecordsData(
+                                                          id: fetchId.i!);
+                                                  print("UPDATE SUCCESSFULL");
+                                                  DBHelper.dbHelper
+                                                      .insertIntoFavourite(
+                                                          data: ss[i]);
                                                 }
-                                                return Center(
-                                                  child:
-                                                      CupertinoActivityIndicator(),
-                                                );
-                                              }),
-                                          cupertinoButton(
-                                            icon: CupertinoIcons.camera,
-                                            color: CupertinoColors.white.withOpacity(0.5),
-                                            onPressed: () {
-                                              // screenshotController
-                                              //     .capture(
-                                              //     delay: Duration(
-                                              //         milliseconds: 10))
-                                              //     .then((capturedImage) async {
-                                              //   ShowCapturedWidget(
-                                              //       context, capturedImage!);
-                                              //   _imageFile = capturedImage;
-                                              //   setState(() {});
-                                              // }).catchError((onError) {
-                                              //   print(onError);
-                                              // });
 
-                                              showCupertinoDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return CupertinoAlertDialog(
-                                                    actions: [
-                                                      CupertinoDialogAction(
-                                                        child:
-                                                            Text("Home Screen"),
-                                                        onPressed: () async {
-                                                          setWallpaper(
-                                                            wallpaperLocation:
-                                                                AsyncWallpaper
-                                                                    .HOME_SCREEN,
+                                                setState(() {});
+                                              },
+                                            ),
+                                            cupertinoButton(
+                                              icon: CupertinoIcons.share_up,
+                                              color: CupertinoColors.systemGrey,
+                                              onPressed: () {
+                                                screenshotController
+                                                    .capture(
+                                                        delay: Duration(
+                                                            milliseconds: 10))
+                                                    .then((uint8List) async {
+                                                  final tempDir =
+                                                      await getTemporaryDirectory();
+                                                  final file = await File(
+                                                          "${tempDir.path}/image.png")
+                                                      .create();
+
+                                                  file.writeAsBytesSync(
+                                                      uint8List as List<int>);
+
+                                                  Share.shareFiles(
+                                                      ['${file.path}']);
+                                                }).catchError((onError) {
+                                                  print(onError);
+                                                });
+                                              },
+                                            ),
+                                            SizedBox(
+                                              width: 20,
+                                            ),
+                                            FutureBuilder(
+                                                future: getTableName,
+                                                builder: (context, snapshot) {
+                                                  if (snapshot.hasError) {
+                                                    return Center(
+                                                      child: Text(
+                                                          "Error :${snapshot.error}"),
+                                                    );
+                                                  } else if (snapshot.hasData) {
+                                                    List<NewFolderList_DataBase>?
+                                                        sss = snapshot.data;
+                                                    return (sss!.isEmpty)
+                                                        ? Center(
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: () {
+                                                                Get.back();
+                                                              },
+                                                              child: Text(
+                                                                "Create Folder",
+                                                                style: TextStyle(
+                                                                    color: CupertinoColors
+                                                                        .systemGrey5),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Container(
+                                                            height: 25,
+                                                            width: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5),
+                                                              color:
+                                                                  CupertinoColors
+                                                                      .white,
+                                                            ),
+                                                            // color: CupertinoColors.black,
+                                                            child:
+                                                                CupertinoContextMenu(
+                                                              actions: sss.map(
+                                                                (e) {
+                                                                  int i = sss
+                                                                      .indexOf(
+                                                                          e);
+                                                                  return CupertinoContextMenuAction(
+                                                                    child: Text(
+                                                                        "${e.tableName}"),
+                                                                    onPressed:
+                                                                        () async {
+                                                                      // print(e
+                                                                      //     .tableName);
+                                                                      // await DBHelper
+                                                                      //     .dbHelper
+                                                                      //     .addNewFolder(
+                                                                      //     name:
+                                                                      //     e.tableName);
+                                                                      // print("1");
+                                                                      // await DBHelper
+                                                                      //     .dbHelper
+                                                                      //     .insertIntoNewFolder(
+                                                                      //   tableName:
+                                                                      //   e.tableName,
+                                                                      //   id: ss[i]
+                                                                      //       .id,
+                                                                      //   name: data
+                                                                      //       .name,
+                                                                      //   author: ss[
+                                                                      //   i]
+                                                                      //       .author,
+                                                                      //   quote: ss[
+                                                                      //   i]
+                                                                      //       .quote,
+                                                                      // );
+                                                                      // print("2");
+                                                                      // Get.snackbar(
+                                                                      //     "SUSSESS",
+                                                                      //     "Successfully Insert Into ${e.tableName}");
+                                                                      // print("3");
+                                                                    },
+                                                                  );
+                                                                },
+                                                              ).toList(),
+                                                              child: Container(
+                                                                height: 25,
+                                                                width: 25,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              5),
+                                                                  color:
+                                                                      CupertinoColors
+                                                                          .white,
+                                                                ),
+                                                                child: Icon(
+                                                                  CupertinoIcons
+                                                                      .add,
+                                                                ),
+                                                              ),
+                                                            ),
                                                           );
-                                                        },
-                                                      ),
-                                                      CupertinoDialogAction(
-                                                        child:
-                                                            Text("Lock Screen"),
-                                                        onPressed: () async {
-                                                          setWallpaper(
-                                                            wallpaperLocation:
-                                                                AsyncWallpaper
-                                                                    .LOCK_SCREEN,
-                                                          );
-                                                        },
-                                                      ),
-                                                      CupertinoDialogAction(
-                                                        child:
-                                                            Text("Both Screen"),
-                                                        onPressed: () async {
-                                                          setWallpaper(
-                                                            wallpaperLocation:
-                                                                AsyncWallpaper
-                                                                    .BOTH_SCREENS,
-                                                          );
-                                                        },
-                                                      ),
-                                                    ],
-                                                    title:
-                                                        Text("Set Wallpaper"),
+                                                  }
+                                                  return Center(
+                                                    child:
+                                                        CupertinoActivityIndicator(),
                                                   );
-                                                },
-                                              );
-                                            },
-                                          ),
-                                          cupertinoButton(
-                                            icon: CupertinoIcons.delete,
-                                            color: CupertinoColors.white.withOpacity(0.5),
-                                            onPressed: null,
-                                          ),
-                                        ],
-                                      ),
+                                                }),
+                                            SizedBox(
+                                              width: 20,
+                                            ),
+                                            cupertinoButton(
+                                              icon: CupertinoIcons.camera,
+                                              color: CupertinoColors.systemGrey,
+                                              onPressed: () {
+                                                showCupertinoDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return CupertinoAlertDialog(
+                                                      actions: [
+                                                        CupertinoDialogAction(
+                                                          child: Text(
+                                                              "Home Screen"),
+                                                          onPressed: () async {
+                                                            Get.back();
+                                                            setWallpaper(
+                                                              wallpaperLocation:
+                                                                  AsyncWallpaper
+                                                                      .HOME_SCREEN,
+                                                            );
+                                                          },
+                                                        ),
+                                                        CupertinoDialogAction(
+                                                          child: Text(
+                                                              "Lock Screen"),
+                                                          onPressed: () async {
+                                                            Get.back();
+                                                            setWallpaper(
+                                                              wallpaperLocation:
+                                                                  AsyncWallpaper
+                                                                      .LOCK_SCREEN,
+                                                            );
+                                                          },
+                                                        ),
+                                                        CupertinoDialogAction(
+                                                          child: Text(
+                                                              "Both Screen"),
+                                                          onPressed: () async {
+                                                            Get.back();
+                                                            setWallpaper(
+                                                              wallpaperLocation:
+                                                                  AsyncWallpaper
+                                                                      .BOTH_SCREENS,
+                                                            );
+                                                          },
+                                                        ),
+                                                      ],
+                                                      title:
+                                                          Text("Set Wallpaper"),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                            cupertinoButton(
+                                              icon: CupertinoIcons.delete,
+                                              color: CupertinoColors.systemGrey,
+                                              onPressed: null,
+                                            ),
+                                          ],
+                                        ),
+                                      )
                                     ],
                                   ),
                                 );
@@ -485,7 +525,6 @@ class _DetailsPageState extends State<DetailsPage> {
 
       await imageFile.writeAsBytes(uint8list);
 
-// Set the wallpaper from the file
       await AsyncWallpaper.setWallpaperFromFile(
         filePath: imagePath,
         wallpaperLocation: wallpaperLocation,

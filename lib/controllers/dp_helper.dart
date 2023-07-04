@@ -43,14 +43,14 @@ class DBHelper {
 
       await db.execute(query1);
       String query =
-          "CREATE TABLE IF NOT EXISTS quotes(id INTEGER,idd INTEGER,author TEXT NOT NULL, quote TEXT NOT NULL, favourite TEXT NOT NULL)";
+          "CREATE TABLE IF NOT EXISTS quotes(id INTEGER, idd INTEGER, author TEXT, quote TEXT, favourite Text)";
 
       await db.execute(query);
 
-      String queryFavourite =
-          "CREATE TABLE IF NOT EXISTS quotesFavourite(id INTEGER,author TEXT NOT NULL, quote TEXT NOT NULL, favourite TEXT NOT NULL)";
+      String sql =
+          "CREATE TABLE IF NOT EXISTS favouriteTable(id INTEGER, idd INTEGER, author TEXT, quote TEXT, favourite Text)";
 
-      await db.execute(queryFavourite);
+      await db.execute(sql);
     });
   }
 
@@ -67,24 +67,15 @@ class DBHelper {
       ];
 
       await db?.rawInsert(query, args1);
-      print("repeat");
     }
   }
 
   insertQuotesData() async {
     await initDB();
-    List<QuotesModel>? data;
-    if(box.read('loaclStorage') != true){
 
-    data = await LJHelper.ljHelper.fetchDataFromJsonBank();
-    }
+    List<QuotesModel> data = await LJHelper.ljHelper.fetchDataFromJsonBank();
 
-    Storage storage = Storage();
-
-    storage.trueMethodOfLocal();
-
-
-    for (int i = 0; i < data!.length; i++) {
+    for (int i = 0; i < data.length; i++) {
       for (int j = 0; j < data[i].quotes.length; j++) {
         String queryList =
             "INSERT INTO quotes(id, idd, quote, author, favourite) VALUES(?, ?, ?, ?, ?);";
@@ -96,9 +87,7 @@ class DBHelper {
           data[i].quotes[j].author,
           data[i].quotes[j].fav,
         ];
-
         await db?.rawInsert(queryList, args);
-        print("repeat");
       }
     }
   }
@@ -140,51 +129,49 @@ class DBHelper {
     List args = [id];
     print(id);
 
-    List<Map<String, dynamic>> allQuotes = (await db!.rawQuery(query, args));
+    List<Map<String, dynamic>> allQuotes = await db!.rawQuery(query, args);
 
     print("start");
-    print(allQuotes);
+
     List<DataBase> quotes =
         allQuotes.map((e) => DataBase.fromMap(data: e)).toList();
+
+    print(allQuotes[0]['favourite']);
+    print(quotes[0].favourite);
     print("end");
     print('=========================');
 
     return quotes;
   }
 
-  updateData({String? val, int? id, int? idd}) async {
+  UpDateIntoQuotes(
+      {required String val,
+      required int fetchId,
+      required int fetchIdd}) async {
     await initDB();
 
-    String sql = 'UPDATE quotes SET favourite = ? WHERE id = ?, idd = ?;';
+    String sql = "UPDATE quotes SET favourite = ? WHERE id = ? AND idd = ?;";
 
-    List args = ["true", id, idd];
-    print("Start");
+    List args = [val, fetchId, fetchIdd];
+
     int res = await db!.rawUpdate(sql, args);
-    print(res);
-    print("End");
 
+    print(res);
   }
 
-  fetchAllDataFavourite({required String data}) async {
+  UpDateIntoQuotesForFalse(
+      {required String val,
+      required int fetchId,
+      required int fetchIdd}) async {
     await initDB();
-    if (box.read('storageFavourite') != true) {
-      await insertQuotesData;
-    }
-    Storage storage = Storage();
 
-    storage.trueMethodOfFavourite();
+    String sql = "UPDATE quotes SET favourite = ? WHERE id = ? AND idd = ?;";
 
-    String query = "SELECT * FROM quotes WHERE favourite = ?";
-    List args = [data];
+    List args = [val, fetchId, fetchIdd];
 
-    List<Map<String, dynamic>> allQuotes = (await db!.rawQuery(query, args));
-    print("Favourite Start");
-    print(allQuotes);
-    print("Favourite End");
+    int res = await db!.rawUpdate(sql, args);
 
-    List<DataBaseFavourite> quotes = allQuotes.map((e) => DataBaseFavourite.fromMap(data: e)).toList();
-
-    return quotes;
+    print(res);
   }
 
   Future addNewFolderNameSave() async {
@@ -218,16 +205,10 @@ class DBHelper {
     String sql = "SELECT * FROM newFolderNameList";
 
     List<Map>? selected = await db?.rawQuery(sql);
-    //
-    // print("Start");
-    // print(selected);
-    // print("End");
 
     List<NewFolderList_DataBase>? newData =
         selected?.map((e) => NewFolderList_DataBase.fromMap(name: e)).toList();
-    // print("Start");
-    // print(newData);
-    // print("End");
+
     return newData;
   }
 
@@ -238,7 +219,7 @@ class DBHelper {
 
     db = await openDatabase(path, version: 1, onCreate: (db, _) async {
       String sql =
-          "CREATE TABLE IF NOT EXISTS $name(id INTEGER, name TEXT NOT NULL, author TEXT NOT NULL, quote TEXT NOT NULL)";
+          "CREATE TABLE IF NOT EXISTS $name(id, INTEGER, name TEXT NOT NULL, author TEXT NOT NULL, quote TEXT NOT NULL)";
 
       await db.execute(sql);
     });
@@ -281,23 +262,48 @@ class DBHelper {
     return newData;
   }
 
-  // insertIntoFavourite() async {
-  //   await initDB();
-  //
-  //   String query =
-  //       "INSERT INTO quotesFavourite(id, quote, author, favourite) VALUES(?, ?, ?, ?);";
-  //
-  //   List args = [
-  //     data.id,
-  //     data.quote,
-  //     data.author,
-  //     data.fav,
-  //   ];
-  //
-  //   await db?.rawInsert(query, args);
-  // }
+  insertIntoFavourite({DataBase? data}) async {
+    await initDB();
 
+    if (data != null) {
+      String queryList =
+          "INSERT INTO favouriteTable(id, idd, quote, author, favourite) VALUES(?, ?, ?, ?, ?);";
 
+      List args = [
+        data.id,
+        data.idd,
+        data.quote,
+        data.author,
+        data.favourite,
+      ];
+
+      await db?.rawInsert(queryList, args);
+    }
+  }
+
+  Future<List<DataBase>> fetchAllDataFavourite() async {
+    await initDB();
+
+    await insertIntoFavourite();
+
+    String sql = "SELECT * FROM favouriteTable";
+
+    List<Map> data = await db!.rawQuery(sql);
+    print(data);
+
+    List<DataBase> quotes = data.map((e) => DataBase.fromMap(data: e)).toList();
+
+    return quotes;
+  }
+
+  deleteFromFavourite({required int id, required int idd}) async {
+    await initDB();
+
+    String sql = "DELETE FROM favouriteTable WHERE id = ? AND idd = ?";
+    List args = [id, idd];
+    int res = await db!.rawDelete(sql);
+    print("DELETE : $res");
+  }
 }
 
 class WIHelper {
@@ -308,7 +314,7 @@ class WIHelper {
   Future<List<Image_Model>?> fetchAllImages({required String search}) async {
     String apiKey = "38022194-f8abec777322f4050db0733cd";
     String url =
-        "https://pixabay.com/api/?key=$apiKey&q=$search&image_type=photo";
+        "https://pixabay.com/api/?key=$apiKey&q=$search&image_type=photo&pretty=true";
 
     http.Response res = await http.get(Uri.parse(url));
 

@@ -1,7 +1,7 @@
 
-import 'package:flutter/material.dart';
+import 'dart:ui';
 
-class SettingController_Model{
+class SettingController_Model {
   bool isDarkMode;
 
   SettingController_Model({
@@ -50,7 +50,7 @@ class Quote {
         idd: data["idd"],
         quote: data["quote"],
         author: data["author"],
-        fav : data["like"],
+        fav: data["fav"],
       );
 }
 // jsonBank
@@ -77,14 +77,14 @@ class DataBase {
   int idd;
   String quote;
   String author;
-  String fav;
+  String? favourite;
 
   DataBase({
     required this.id,
     required this.idd,
     required this.author,
     required this.quote,
-    required this.fav,
+    required this.favourite,
   });
 
   factory DataBase.fromMap({required Map? data}) {
@@ -93,33 +93,7 @@ class DataBase {
       idd: data["idd"],
       quote: data["quote"],
       author: data["author"],
-      fav : data["favourite"],
-    );
-  }
-}
-
-class DataBaseFavourite {
-  int id;
-  int idd;
-  String quote;
-  String author;
-  String fav;
-
-  DataBaseFavourite({
-    required this.id,
-    required this.idd,
-    required this.author,
-    required this.quote,
-    required this.fav,
-  });
-
-  factory DataBaseFavourite.fromMap({required Map? data}) {
-    return DataBaseFavourite(
-      id: data!["id"],
-      idd: data["idd"],
-      quote: data["quote"],
-      author: data["author"],
-      fav : data["favourite"],
+      favourite: data["favourite"],
     );
   }
 } // Table
@@ -127,9 +101,9 @@ class DataBaseFavourite {
 class NewFolderList_Model {
   List newFolderList = [];
 
-  NewFolderList_Model(
-    this.newFolderList,
-  );
+  NewFolderList_Model({
+    required this.newFolderList,
+  });
 }
 
 class NewFolderList_DataBase {
@@ -146,12 +120,14 @@ class NewFolderList_DataBase {
 
 class NewFolderData {
   int id;
+  int idd;
   String name;
   String author;
   String quote;
 
   NewFolderData({
     required this.id,
+    required this.idd,
     required this.name,
     required this.author,
     required this.quote,
@@ -160,10 +136,23 @@ class NewFolderData {
   factory NewFolderData.fromMap({required Map? data}) {
     return NewFolderData(
       id: data?["id"],
+      idd: data?["idd"],
       name: data?["name"],
       author: data?["author"],
       quote: data?["quote"],
     );
+  }
+}
+
+class Favourite_Data {
+  String fav;
+
+  Favourite_Data({
+    required this.fav,
+  });
+
+  factory Favourite_Data.fromMap({required Map data}){
+    return Favourite_Data(fav: data['like']);
   }
 }
 
@@ -179,13 +168,11 @@ class StorageData {
   bool storageData;
   bool storage;
   bool storageFavourite;
-  bool loaclStorage;
 
   StorageData({
     required this.storageData,
     required this.storage,
     required this.storageFavourite,
-    required this.loaclStorage,
   });
 }
 
@@ -204,26 +191,26 @@ class Image_Model {
     required this.image,
   });
 
-  factory Image_Model.fromMap({required Map data}){
+  factory Image_Model.fromMap({required Map data}) {
     return Image_Model(image: data['largeImageURL']);
   }
 }
 
-class TextEditMenu_Model{
- Color? color;
- Color? backgroundColor;
- FontWeight? fontWeight;
- double? fontSize;
- FontStyle? fontStyle;
- double letterSpacing;
- double? wordSpacing;
+class TextEditMenu_Model {
+  Color color;
+  Color backGroundColor;
+  FontWeight fontWeight;
+  FontStyle fontStyle;
+  double fontSize;
+  double letterSpacing;
+  double wordSpacing;
 
- TextEditMenu_Model({
+  TextEditMenu_Model({
     required this.color,
-    required this.backgroundColor,
+    required this.backGroundColor,
     required this.fontWeight,
-    required this.fontSize,
     required this.fontStyle,
+    required this.fontSize,
     required this.letterSpacing,
     required this.wordSpacing,
   });
