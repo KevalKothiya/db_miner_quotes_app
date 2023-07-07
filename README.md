@@ -84,6 +84,10 @@ JSON parsing.
 
 
 
+https://github.com/KevalKothiya/db_miner_quotes_app/assets/131429045/9d284621-7ca6-4237-82f3-7165fbb0fc7c
+
+
+
 
 
 
